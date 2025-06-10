@@ -208,15 +208,17 @@ foreach ($owned as $id) {
         if ($header) {
             ?>
             <h2>Neglected Listings Notification</h2>
-            <p>The following listings have gone on two months without a
-                newly-approved member or a new/updated affiliate!</p>
+            <p>The following listings have gone on two months without a newly-approved member or a new/updated affiliate!</p>
             <ul>
             <?php
             $header = false;
         }
+        // Provide a default value if $stats['lastupdated'] is null or empty
+        $lastUpdated = $stats['lastupdated'] ?? '1970-01-01'; // Using the null coalescing operator to default to a known date
+
         // prepare date format
-        $readable = @date(get_setting('date_format'),
-            strtotime($stats['lastupdated']));
+        $readable = date(get_setting('date_format'), strtotime($lastUpdated));
+
         echo '<li> ';
         if ($info['title']) {
             echo $info['title'];
@@ -224,12 +226,10 @@ foreach ($owned as $id) {
             echo $info['subject'];
         }
         echo ", last updated $readable;<br />manage ";
-        echo '<a href="members.php?id=' . $info['listingid'] .
-            '">members</a>';
+        echo '<a href="members.php?id=' . $info['listingid'] . '">members</a>';
         if ($info['affiliates'] == 1) // don't show if affiliates aren't enabled
         {
-            echo ' or <a href="affiliates.php?listing=' .
-                $info['listingid'] . '">affiliates</a>';
+            echo ' or <a href="affiliates.php?listing=' . $info['listingid'] . '">affiliates</a>';
         }
         echo '?</li>';
     }
