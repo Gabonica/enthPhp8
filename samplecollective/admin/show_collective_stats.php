@@ -23,7 +23,7 @@
  *
  * For more information please view the readme.txt file.
  ******************************************************************************/
-require 'config.php';
+require_once 'config.php';
 
 require_once('mod_errorlogs.php');
 require_once('mod_categories.php');

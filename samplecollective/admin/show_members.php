@@ -151,47 +151,50 @@ foreach ($members as $mem) {
     // set additional fields
     foreach (explode(',', $info['additional']) as $field) {
         if ($field != '') {
-            if (!in_array($field, $sort) ||
-                (isset($show_sort_field) && $show_sort_field)) {
+            // Provide a default value if $mem[$field] is null
+            $value = $mem[$field] ?? ''; // Using the null coalescing operator to default to an empty string
+
+            if (!in_array($field, $sort) || (isset($show_sort_field) && $show_sort_field)) {
                 // you're not sorting by this, or you will show it anyway
-                $formatted = @str_replace('$$fan_' . $field . '$$',
-                    $mem[$field], $formatted);
-            } else if ($_GET[$field] == 'all' ||
-                ((!isset($_GET[$field]) || $_GET[$field] == '') &&
-                    isset($no_sort))) {
-                $formatted = @str_replace('$$fan_' . $field . '$$',
-                    $mem[$field], $formatted);
+                $formatted = @str_replace('$$fan_' . $field . '$$', $value, $formatted);
+            } else if ($_GET[$field] == 'all' || ((!isset($_GET[$field]) || $_GET[$field] == '') && isset($no_sort))) {
+                $formatted = @str_replace('$$fan_' . $field . '$$', $value, $formatted);
             } else {
-                $formatted = @str_replace('$$fan_' . $field . '$$', '',
-                    $formatted);
+                $formatted = @str_replace('$$fan_' . $field . '$$', '', $formatted);
             }
         }
     }
 
     if ($mem['showemail'] == 0) {
         // member doesn't want to show email
-        $email_actual = '<span style="text-decoration: ' .
-            'line-through;" class="show_members_no_email">email</span>';
+        $email_actual = '<span style="text-decoration: line-through;" class="show_members_no_email">email</span>';
         $email_plain = '';
-        $email_generic = '<span style="text-decoration: ' .
-            'line-through;" class="show_members_no_email">email</span>';
+        $email_generic = '<span style="text-decoration: line-through;" class="show_members_no_email">email</span>';
     } else {
         // show email address on the list
         $cutup = explode('@', $mem['email']);
-        $email_actual = '<script type="text/javascript">' . "\r\n<!--\r\n" .
-            "jsemail = ( '$cutup[0]' + '@' + '$cutup[1]' ); \r\n" .
-            "document.write( '<a href=\"mailto:' + jsemail + '\" class=\"" .
-            "show_members_email\">' + jsemail " .
-            "+ '</' + 'a>' );\r\n" . ' -->' . "\r\n" . '</script>';
-        $email_plain = str_replace('@', ' {at} ', $mem['email']);
-        $email_generic = '<script type="text/javascript">' . "\r\n" .
-            "<!--\r\n" .
-            "jsemail = ( '$cutup[0]' + '@' + '$cutup[1]' ); \r\n" .
-            "document.write( '<a href=\"mailto:' + jsemail + '\" class=\"" .
-            'show_members_email">email</\' + \'a>\' ' . ");\r\n" .
-            " -->\r\n" .
-            '</script>';
+
+        // Check if the email address contains an '@' symbol
+        if (count($cutup) === 2) {
+            $email_actual = '<script type="text/javascript">' . "\r\n<!--\r\n" .
+                "jsemail = ( '$cutup[0]' + '@' + '$cutup[1]' ); \r\n" .
+                "document.write( '<a href=\"mailto:' + jsemail + '\" class=\"show_members_email\">' + jsemail " .
+                "+ '</' + 'a>' );\r\n" . ' -->' . "\r\n" . '</script>';
+            $email_plain = str_replace('@', ' {at} ', $mem['email']);
+            $email_generic = '<script type="text/javascript">' . "\r\n" .
+                "<!--\r\n" .
+                "jsemail = ( '$cutup[0]' + '@' + '$cutup[1]' ); \r\n" .
+                "document.write( '<a href=\"mailto:' + jsemail + '\" class=\"show_members_email\">email</\' + \'a>\' );\r\n" .
+                " -->\r\n" .
+                '</script>';
+        } else {
+            // Handle the case where the email address does not contain an '@' symbol
+            $email_actual = '<span style="text-decoration: line-through;" class="show_members_no_email">invalid email</span>';
+            $email_plain = '';
+            $email_generic = '<span style="text-decoration: line-through;" class="show_members_no_email">invalid email</span>';
+        }
     }
+
 
     if ($mem['showurl'] == 0 || $mem['url'] == '') {
         // there is no url, or owner doesn't want this url shown

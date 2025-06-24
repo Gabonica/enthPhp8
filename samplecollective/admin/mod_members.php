@@ -110,23 +110,25 @@ function parse_email($type, $listing, $email, $password = '')
     // search and replace special variables
     $template = str_replace(['$$owner_name$$', '$$fanlisting_title$$', '$$fanlisting_subject$$', '$$fanlisting_email$$', '$$fanlisting_url$$', '$$fanlisting_list$$', '$$fanlisting_update$$', '$$fanlisting_join$$', '$$fanlisting_lostpass$$', '$$listing_type$$', '$$fan_name$$', '$$fan_email$$'], [$owner_name, $info['title'], $info['subject'], $info['email'], $info['url'], $info['listpage'], $info['updatepage'], $info['joinpage'], $info['lostpasspage'], $info['listingtype'], $fan['name'], $fan['email']], $template);
     if ($info['country'] == 1) {
-        $template = str_replace('$$fan_country$$', $fan['country'],
-            $template);
+        $template = str_replace('$$fan_country$$', $fan['country'], $template);
     }
     $template = str_replace(['$$fan_url$$', '$$fan_password$$'], [$fan['url'], $password], $template);
-    $fields = explode(',', $info['additional']);
+
+    // Provide a default value if $info['additional'] is null
+    $additionalFields = $info['additional'] ?? ''; // Using the null coalescing operator to default to an empty string
+
+    $fields = explode(',', $additionalFields);
     foreach ($fields as $field) {
         if ($field == '') {
             continue;
         }
-        $template = str_replace('$$fan_' . $field . '$$', $fan[$field],
-            $template);
+        $template = str_replace('$$fan_' . $field . '$$', $fan[$field], $template);
     }
 
     $db_link_list = null;
     $db_link = null;
     return $template;
-}
+    }
 
 
 /*___________________________________________________________________________*/
@@ -417,105 +419,108 @@ function edit_member_info($id, $email, $fields, $hold = 'no')
 
     // get info
     $query = "SELECT * FROM `$db_owned` WHERE `listingid` = :id";
-    $result = $db_link->prepare($query);
-    $result->bindParam(':id', $id, PDO::PARAM_INT);
-    $result->execute();
-    if (!$result) {
-        log_error(__FILE__ . ':' . __LINE__,
-            'Error executing query: <i>' . $result->errorInfo()[2] .
-            '</i>; Query is: <code>' . $query . '</code>');
-        die(STANDARD_ERROR);
-    }
-    $result->setFetchMode(PDO::FETCH_ASSOC);
-    $info = $result->fetch();
-    $table = $info['dbtable'];
-    $dbserver = $info['dbserver'];
-    $dbdatabase = $info['dbdatabase'];
-    $dbuser = $info['dbuser'];
-    $dbpassword = $info['dbpassword'];
+$result = $db_link->prepare($query);
+$result->bindParam(':id', $id, PDO::PARAM_INT);
+$result->execute();
+if (!$result) {
+    log_error(__FILE__ . ':' . __LINE__,
+        'Error executing query: <i>' . $result->errorInfo()[2] .
+        '</i>; Query is: <code>' . $query . '</code>');
+    die(STANDARD_ERROR);
+}
+$result->setFetchMode(PDO::FETCH_ASSOC);
+$info = $result->fetch();
+$table = $info['dbtable'];
+$dbserver = $info['dbserver'];
+$dbdatabase = $info['dbdatabase'];
+$dbuser = $info['dbuser'];
+$dbpassword = $info['dbpassword'];
 
-    try {
-        $db_link_list = new PDO('mysql:host=' . $dbserver . ';dbname=' . $dbdatabase . ';charset=utf8', $dbuser, $dbpassword);
-        $db_link_list->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        die(DATABASE_CONNECT_ERROR . $e->getMessage());
-    }
+// Provide a default value if $info['additional'] is null
+$additional = $info['additional'] ?? ''; // Using the null coalescing operator to default to an empty string
 
-    foreach ($fields as $field => $value) {
-        $query = '';
-        switch ($field) {
+try {
+    $db_link_list = new PDO('mysql:host=' . $dbserver . ';dbname=' . $dbdatabase . ';charset=utf8', $dbuser, $dbpassword);
+    $db_link_list->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die(DATABASE_CONNECT_ERROR . $e->getMessage());
+}
 
-            case 'id' :
-                break;
-            case 'showurl' :
-            case 'showemail' :
-                $query = "UPDATE `$table` SET `$field` = ";
-                if ($value === 'show') {
-                    $value = 1;
-                } else if ($value === 'hide') {
-                    $value = '0';
-                } else {
-                    continue 2;
-                }
-                $query .= "'$value' WHERE LOWER(TRIM(`email`)) = LOWER(TRIM('$email'))";
-                break;
+foreach ($fields as $field => $value) {
+    $query = '';
+    switch ($field) {
 
-            case 'name' :
-            case 'country' :
-                $col = $field;
-                $value = StringUtils::instance()->clean($value);
-                $query = "UPDATE `$table` SET `$col` = '$value' " .
-                    "WHERE LOWER(TRIM(`email`)) = LOWER(TRIM('$email'))";
-                break;
-
-            case 'email_new' :
-            case 'url' :
-                $col = $field;
-                if ($field === 'email_new') {
-                    $col = 'email';
-                }
-                $value = StringUtils::instance()->cleanNormalize($value);
-                $query = "UPDATE `$table` SET `$col` = '$value' " .
-                    "WHERE LOWER(TRIM(`email`)) = LOWER(TRIM('$email'))";
-                if ($field === 'email_new') {
-                    $email = $value;
-                }
-                break;
-
-            case 'password' :
-                if ($value != '') {
-                    $query = "UPDATE `$table` SET `password` = " .
-                        "MD5( '$value' ) WHERE LOWER(TRIM(`email`)) = LOWER(TRIM('$email'))";
-                }
-                break;
-
-            case 'approved' :
-                if ($value == '1') {
-                    $query = "UPDATE `$table` SET `pending` = 0 WHERE LOWER(TRIM(`email`)) = " .
-                        "LOWER(TRIM('$email'))";
-                }
-                break;
-
-            default :
-                if (substr_count($info['additional'], $field) > 0) {
-                    // update field
-                    $query = "UPDATE `$table` SET `$field` = '" .
-                        $value . "' WHERE LOWER(TRIM(`email`)) = LOWER(TRIM('$email'))";
-                }
-                break;
-
-        } // end switch
-
-        if ($query) {
-            $result = $db_link->query($query);
-            if (!$result) {
-                log_error(__FILE__ . ':' . __LINE__,
-                    'Error executing query: <i>' . $result->errorInfo()[2] .
-                    '</i>; Query is: <code>' . $query . '</code>');
-                die(STANDARD_ERROR);
+        case 'id' :
+            break;
+        case 'showurl' :
+        case 'showemail' :
+            $query = "UPDATE `$table` SET `$field` = ";
+            if ($value === 'show') {
+                $value = 1;
+            } else if ($value === 'hide') {
+                $value = '0';
+            } else {
+                continue 2;
             }
-        } // end if query
-    } // end foreach
+            $query .= "'$value' WHERE LOWER(TRIM(`email`)) = LOWER(TRIM('$email'))";
+            break;
+
+        case 'name' :
+        case 'country' :
+            $col = $field;
+            $value = StringUtils::instance()->clean($value);
+            $query = "UPDATE `$table` SET `$col` = '$value' " .
+                "WHERE LOWER(TRIM(`email`)) = LOWER(TRIM('$email'))";
+            break;
+
+        case 'email_new' :
+        case 'url' :
+            $col = $field;
+            if ($field === 'email_new') {
+                $col = 'email';
+            }
+            $value = StringUtils::instance()->cleanNormalize($value);
+            $query = "UPDATE `$table` SET `$col` = '$value' " .
+                "WHERE LOWER(TRIM(`email`)) = LOWER(TRIM('$email'))";
+            if ($field === 'email_new') {
+                $email = $value;
+            }
+            break;
+
+        case 'password' :
+            if ($value != '') {
+                $query = "UPDATE `$table` SET `password` = " .
+                    "MD5( '$value' ) WHERE LOWER(TRIM(`email`)) = LOWER(TRIM('$email'))";
+            }
+            break;
+
+        case 'approved' :
+            if ($value == '1') {
+                $query = "UPDATE `$table` SET `pending` = 0 WHERE LOWER(TRIM(`email`)) = " .
+                    "LOWER(TRIM('$email'))";
+            }
+            break;
+
+        default :
+            if (substr_count($additional, $field) > 0) {
+                // update field
+                $query = "UPDATE `$table` SET `$field` = '" .
+                    $value . "' WHERE LOWER(TRIM(`email`)) = LOWER(TRIM('$email'))";
+            }
+            break;
+
+    } // end switch
+
+    if ($query) {
+        $result = $db_link->query($query);
+        if (!$result) {
+            log_error(__FILE__ . ':' . __LINE__,
+                'Error executing query: <i>' . $result->errorInfo()[2] .
+                '</i>; Query is: <code>' . $query . '</code>');
+            die(STANDARD_ERROR);
+        }
+    } // end if query
+} // end foreach
 
     if ($hold !== 'no' && $info['holdupdate'] == 1) {
         // place on pending!

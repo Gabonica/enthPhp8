@@ -158,9 +158,13 @@ function show_edit_forms()
     <h2>Quick <?= $info['listingtype'] ?> stats</h2>
     <?php
     $stats = get_listing_stats($info['listingid']);
-    // prepare date format
-    $lastupdated = @date(get_setting('date_format'),
-        strtotime($stats['lastupdated']));
+
+    // Provide a default value if $stats['lastupdated'] is null or empty
+    $lastUpdatedDate = $stats['lastupdated'] ?? '1970-01-01'; // Using the null coalescing operator to default to a known date
+
+    // Prepare date format
+    $lastupdated = date(get_setting('date_format'), strtotime($lastUpdatedDate));
+
     $countries = $stats['countries'];
     $average = $stats['average'];
     ?>
@@ -1741,7 +1745,7 @@ function delete_owned($id)
 
     // unlink image if present
     if ($dir . $image) {
-        unlink($dir . $file);
+        unlink($dir . $image);
     }
 
     return true;
@@ -1930,35 +1934,39 @@ function parse_owned_template($id)
     // get listing stats now
     $stats = get_listing_stats($info['listingid']);
 
-    $formatted = str_replace('enth3-url', $info['url'], $setting['value']);
-    $formatted = str_replace('enth3-subject', $info['subject'], $formatted);
-    $formatted = str_replace('enth3-title', $info['title'], $formatted);
-    $formatted = str_replace('enth3-desc', $info['desc'], $formatted);
-    $formatted = str_replace('enth3-image', $dir . $info['imagefile'],
-        $formatted);
+    $formatted = str_replace('enth3-url', $info['url'] ?? '', $setting['value']);
+    $formatted = str_replace('enth3-subject', $info['subject'] ?? '', $formatted);
+    $formatted = str_replace('enth3-title', $info['title'] ?? '', $formatted);
+    $formatted = str_replace('enth3-desc', $info['desc'] ?? '', $formatted);
+    $formatted = str_replace('enth3-image', $dir . ($info['imagefile'] ?? ''), $formatted);
+
     if (count($image)) {
-        $formatted = str_replace('enth3-width', $image[0], $formatted);
-        $formatted = str_replace('enth3-height', $image[1], $formatted);
+        $formatted = str_replace('enth3-width', $image[0] ?? '', $formatted);
+        $formatted = str_replace('enth3-height', $image[1] ?? '', $formatted);
     }
+
     $formatted = str_replace('enth3-categories', $cats, $formatted);
-    $formatted = str_replace('enth3-listingtype', $info['listingtype'],
-        $formatted);
-    $formatted = str_replace('enth3-desc', $info['desc'], $formatted);
-    $formatted = @str_replace('enth3-opened', date($dateformat,
-        strtotime($info['opened'])), $formatted);
-    $formatted = @str_replace('enth3-updated', date($dateformat,
-        strtotime($stats['lastupdated'])), $formatted);
-    $formatted = str_replace('enth3-pending', $stats['pending'], $formatted);
-    $formatted = str_replace('enth3-approved', $stats['total'], $formatted);
-    $formatted = str_replace('enth3-status', $info['status'], $formatted);
-    $formatted = str_replace('enth3-growth', $stats['average'], $formatted);
-    $formatted = str_replace('enth3-countries', $stats['countries'],
-        $formatted);
-    $formatted = str_replace('enth3-newmembers', $stats['new_members'],
-        $formatted);
+    $formatted = str_replace('enth3-listingtype', $info['listingtype'], $formatted);
+    $formatted = str_replace('enth3-desc', $info['desc'] ?? '', $formatted);
+
+    // Provide default values for date fields if they are null
+    $openedDate = $info['opened'] ?? '1970-01-01';
+    $lastUpdatedDate = $stats['lastupdated'] ?? '1970-01-01';
+
+    // Use the default values in strtotime
+    $formatted = str_replace('enth3-opened', date($dateformat, strtotime($openedDate)), $formatted);
+    $formatted = str_replace('enth3-updated', date($dateformat, strtotime($lastUpdatedDate)), $formatted);
+
+    $formatted = str_replace('enth3-pending', $stats['pending'] ?? '', $formatted);
+    $formatted = str_replace('enth3-approved', $stats['total'] ?? '', $formatted);
+    $formatted = str_replace('enth3-status', $info['status'] ?? '', $formatted);
+    $formatted = str_replace('enth3-growth', $stats['average'] ?? '', $formatted);
+    $formatted = str_replace('enth3-countries', $stats['countries'] ?? '', $formatted);
+    $formatted = str_replace('enth3-newmembers', $stats['new_members'] ?? '', $formatted);
+
 
     // deprecated, mostly here for scaling down
-    $formatted = str_replace('enth3-cat', $cats, $formatted);
+    $formatted = str_replace('enth3-cat' ?? '', $cats, $formatted);
 
     return $formatted;
 }
@@ -2358,7 +2366,7 @@ function get_listing_stats($id, $extended = false)
             (isset($randmem['country']) && $randmem['country'])
                 ? $randmem['country'] : '';
         $stats['randommember_email'] = $randmem['email'];
-        $afields = explode(',', $info['additional']);
+        $afields = explode(',', $info['additional'] ?? '');
         foreach ($afields as $field) {
             if ($field) {
                 $stats['randommember_' . $field] = $randmem[$field];

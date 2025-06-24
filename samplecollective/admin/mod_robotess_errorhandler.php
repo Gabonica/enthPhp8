@@ -39,7 +39,7 @@ require_once('Robotess/Autoloader.php');
         die(DATABASE_CONNECT_ERROR . $e->getMessage());
     }
 
-    set_error_handler(static function (int $errno, string $errstr, string $errfile, int $errline, array $errcontext) use
+    set_error_handler(static function (int $errno, string $errstr, string $errfile, int $errline) use
     (
         $db_link,
         $db_settings,

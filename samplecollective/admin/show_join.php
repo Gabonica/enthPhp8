@@ -500,7 +500,7 @@ if ($show_form) {
     </form>
 
     <!--// do not remove the credit link please-->
-    <p style="text-align: center;" class="show_join_credits">
+    <p class="show_join_credits">
         <?php include ENTH_PATH . 'show_credits.php' ?>
     </p>
     <?php

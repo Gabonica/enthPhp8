@@ -265,7 +265,7 @@ function parse_joined_template($id)
 
     $formatted = str_replace('enth3-url', $info['url'], $setting['value']);
     $formatted = str_replace('enth3-subject', $info['subject'], $formatted);
-    $formatted = str_replace('enth3-desc', $info['desc'], $formatted);
+    $formatted = str_replace('enth3-desc', $info['desc'] ?? '', $formatted);
     $formatted = str_replace('enth3-image', $dir . $info['imagefile'],
         $formatted);
     if (is_array($image) && count($image)) {

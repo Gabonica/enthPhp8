@@ -8,9 +8,9 @@
  * $db_database - actual database name
  ******************************************************************************/
 $db_server = 'localhost';
-$db_user = 'u406808841_testing';
-$db_password = 'Tessie5567';
-$db_database = 'u406808841_testing';
+$db_user = 's58037_enth';
+$db_password = 'OxlVGkibV';
+$db_database = 's58037_enth';
 
 
 /******************************************************************************

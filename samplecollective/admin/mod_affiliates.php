@@ -45,12 +45,20 @@ function get_affiliates($listing = 'none', $start = 'none')
     $result = $db_link->query($query);
     if (!$result) {
         log_error(__FILE__ . ':' . __LINE__,
-            'Error executing query: <i>' . $result->errorInfo()[2] .
+            'Error executing query: <i>' . $db_link->errorInfo()[2] .
             '</i>; Query is: <code>' . $query . '</code>');
         die(STANDARD_ERROR);
     }
+
     $result->setFetchMode(PDO::FETCH_ASSOC);
     $row = $result->fetch();
+
+    if ($row === false) {
+        // Handle the case where no rows are returned
+        log_error(__FILE__ . ':' . __LINE__, 'No rows returned from query: <code>' . $query . '</code>');
+        die(STANDARD_ERROR);
+    }
+
     $limit = $row['value'];
 
     $limit_query = '';
@@ -675,20 +683,22 @@ function parse_affiliates_template($id, $listing = '')
     }
 
     // get affiliates dir
-    $query = "SELECT `setting`, `value` FROM `$db_settings` WHERE `setting` =" .
-        ' "affiliates_dir" OR `setting` = "root_path_absolute" OR `setting` = ' .
-        '"root_path_web"';
     if ($listing != '' && $listing != 'collective') {
-        $query = "SELECT `affiliatesdir` FROM `$db_owned` WHERE " .
-            "`listingid` = :listing";
+        $query = "SELECT `affiliatesdir` FROM `$db_owned` WHERE `listingid` = :listing";
+        $result = $db_link->prepare($query);
+        $result->bindParam(':listing', $listing, PDO::PARAM_INT);
+    } else {
+        $query = "SELECT `setting`, `value` FROM `$db_settings` WHERE `setting` = :setting1 OR `setting` = :setting2 OR `setting` = :setting3";
+        $result = $db_link->prepare($query);
+        $result->bindValue(':setting1', 'affiliates_dir');
+        $result->bindValue(':setting2', 'root_path_absolute');
+        $result->bindValue(':setting3', 'root_path_web');
     }
-    $result = $db_link->prepare($query);
-    $result->bindParam(':listing', $listing, PDO::PARAM_INT);
-    $result->execute();
-    if (!$result) {
+    
+    if (!$result->execute()) {
+        $errorInfo = $result->errorInfo();
         log_error(__FILE__ . ':' . __LINE__,
-            'Error executing query: <i>' . $result->errorInfo()[2] .
-            '</i>; Query is: <code>' . $query . '</code>');
+            'Error executing query: <i>' . $errorInfo[2] . '</i>; Query is: <code>' . $query . '</code>');
         die(STANDARD_ERROR);
     }
     $dir = '';
