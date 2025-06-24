@@ -1,16 +1,16 @@
-# Enthusiast for PHP8 [Karin's Fork]
-This is my attempt at modding Enth for PHP 8.2.
+# Enthusiast for PHP8 [Erin's Fork]
+This is the main repo for Enthusiast 1.1 for PHP8.
+
+UPDATE 2/15/24- NO LONGER SUPPORTED BY ME. If anyone wants to take it over that's fine, go ahead and fork it. I don't have the time or energy to support this. I thought I would but I do not.
 
 ## Credits
 The original author is [Angela Sabas](http://scripts.indisguise.org/). Angela's ReadMe can be found [here](https://github.com/DudeThatsErin/enth/blob/main/Old%20Readmes/Angela%20README.md).
 
 [Lysianthus](https://github.com/Lysianthus/enthusiast) also contributed.
 
-The next previous author is [Ekaterina](https://scripts.robotess.net/). Ekaterina's ReadMe can be found [here](https://github.com/DudeThatsErin/enth/blob/main/Old%20Readmes/Ekaterina%20README.md).
+The previous author is [Ekaterina](https://scripts.robotess.net/). Ekaterina's ReadMe can be found [here](https://github.com/DudeThatsErin/enth/blob/main/Old%20Readmes/Ekaterina%20README.md).
 
-*Note: Ekaterina's version is not recommended for new installations. Erin's/mine **can** be used for new installations.*
-
-Previous author is [Erin](https://github.com/DudeThatsErin). Erin's ReadMe can be found [here](https://github.com/Gabonica/enthPhp8/tree/main/Old%20Readmes/Erin%20README.md).
+*Note: Ekaterina's version is not recommended for new installations. Mine **can** be used for new installations.*
 
 # Installation Instructions
 
