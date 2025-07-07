@@ -83,24 +83,18 @@ if (isset($_POST['enth_email']) && $_POST['enth_email'] != '') {
     $email = $cleanNormalizedEmail;
 
     $member = get_member_info($listing, $email);
-    if ($member['email'] == '') {
+    // Check if $member is not null and is an array
+    if (!is_array($member) || !isset($member['email']) || $member['email'] == '') {
         ?>
-        <p style="font-weight: bold;" class="show_lostpass_no_such_member">There
-            was an error in your request to reset your password. This may be
-            because there is no member recorded in the <?= $info['listingtype'] ?>
-            with that email address. Please check your spelling and try
-            again.</p>
+        <p style="font-weight: bold;" class="show_lostpass_no_such_member">There was an error in your request to reset your password. This may be because there is no member recorded in the <?= $info['listingtype'] ?> with that email address. Please check your spelling and try again.</p>
         <?php
     } else {
         $password = reset_member_password($listing, $member['email']);
         // send email
         $to = $member['email'];
-        $subject = $info['title'] . ' ' . ucfirst($info['listingtype']) .
-            ': Password Reset';
-        $from = '"' . html_entity_decode($info['title'], ENT_QUOTES) .
-            '" <' . $info['email'] . '>';
-        $message = parse_email('lostpass', $listing, $member['email'],
-            $password);
+        $subject = $info['title'] . ' ' . ucfirst($info['listingtype']) . ': Password Reset';
+        $from = '"' . html_entity_decode($info['title'], ENT_QUOTES) . '" <' . $info['email'] . '>';
+        $message = parse_email('lostpass', $listing, $member['email'], $password);
         $message = stripslashes($message);
 
         // use send_email function
@@ -108,16 +102,11 @@ if (isset($_POST['enth_email']) && $_POST['enth_email'] != '') {
 
         if ($mail_sent) {
             ?>
-            <p class="show_lostpass_processed_done">A password has been
-                successfully generated for you and this has
-                been sent to your email address. Please update this password
-                as soon as possible for your own security.</p>
+            <p class="show_lostpass_processed_done">A password has been successfully generated for you and this has been sent to your email address. Please update this password as soon as possible for your own security.</p>
             <?php
         } else {
             ?>
-            <p class="show_lostpass_processed_error">There was an error
-                sending the generated password to you. Please
-                email me instead and let me know of the problem.</p>
+            <p class="show_lostpass_processed_error">There was an error sending the generated password to you. Please email me instead and let me know of the problem.</p>
             <?php
         }
         $show_form = false;
