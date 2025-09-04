@@ -77,7 +77,7 @@ require_once ('Robotess/Autoloader.php');
 
 <div class="footer">
     Enthusiast 3 copyright &copy; 2004 - <?= date('Y') ?> by Angela Sabas.<br/>
-    <a href="http://indisguise.org/" target="_blank">Indisguise</a> | <a href="http://scripts.indisguise.org/" target="_blank">Indiscripts</a> | <a href="https://github.com/DudeThatsErin/enth" target="_blank">Erin</a>
+    <a href="http://indisguise.org/" target="_blank">Indisguise</a> | <a href="http://scripts.indisguise.org/" target="_blank">Indiscripts</a> | <a href="https://github.com/DudeThatsErin/enth" target="_blank">Erin Skidds</a>
     <br/><br/><?= RobotessNet\App::getLink() ?>
     - support since 2025 by <a href="https://github.com/Gabonica/enthPhp8" target="_blank" title="Developer">Gabonica</a>
 </div>
