@@ -52,7 +52,7 @@ require_once('mod_errorlogs.php');
 
     <p>You are currently using Enthusiast <?= RobotessNet\App::getVersion() ?>. Please make sure you
         always keep your script up-to-date. Link to the latest version is available on
-        <a href="https://github.com/DudeThatsErin/enth" target="_blank"
+        <a href="https://github.com/Gabonica/enthPhp8" target="_blank"
            title="PHP Script Enthusiast ported to PHP8">project's page</a>.</p>
 
     <h2>Server info (useful for debugging and reporting issues)</h2>

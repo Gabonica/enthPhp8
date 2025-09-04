@@ -1,4 +1,4 @@
-# Enthusiast for PHP8 [Karin's Fork]
+# Enthusiast for PHP8 [Gabonica's Fork]
 My attempt at modding Enth for PHP 8.2.
 
 ## Credits

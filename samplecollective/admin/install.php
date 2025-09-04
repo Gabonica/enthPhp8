@@ -5,6 +5,7 @@
  * Copyright (c) 2018 by Lysianthus (contributor) <she@lysianth.us>
  * Copyright (c) 2020 by Ekaterina (contributor) http://scripts.robotess.net
  * Copyright (c) 2023 by Erin (contributor) https://github.com/DudeThatsErin/enth
+ * Copyright (c) 2025 by Gabonica (contributor) https://github.com/Gabonica/enthPhp8
  *
  * Enthusiast is a tool for (fan)listing collective owners to easily
  * maintain their listing collectives and listings under that collective.
@@ -598,7 +599,7 @@ if ($show_form) {
     ?>
     <p>
         Welcome to the setup/installation of
-        <a href="https://github.com/DudeThatsErin/enth">Enthusiast <?= RobotessNet\App::getVersion() ?></a>, the listing
+        <a href="https://github.com/Gabonica/enthPhp8">Enthusiast <?= RobotessNet\App::getVersion() ?></a>, the listing
         collective management system! Thank you for trying out the script. This file
         sets up the database tables and initial settings for your Enthusiast <?= RobotessNet\App::getVersion() ?>
         installation. Please make sure that your <code>config.php</code> file has
