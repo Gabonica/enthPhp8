@@ -1,5 +1,5 @@
 # Enthusiast for PHP8 [Gabonica's Fork]
-My attempt at modding Enth for PHP 8.2.
+My attempt at modding Enth for PHP 8+
 
 ## Credits
 The original author is [Angela Sabas](http://scripts.indisguise.org/). Angela's ReadMe can be found [here](https://github.com/DudeThatsErin/enth/blob/main/Old%20Readmes/Angela%20README.md).
