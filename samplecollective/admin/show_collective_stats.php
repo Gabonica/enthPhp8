@@ -243,11 +243,11 @@ $result->setFetchMode(PDO::FETCH_ASSOC);
 $row = $result->fetch();
 $owned_growth_rate = 0;
 $days = 1;
+$today = getdate();
 if ($row && count($row) > 0) {
     $firstyear = (int)$row['year'];
     $firstmonth = (int)$row['month'];
     $firstday = (int)$row['day'];
-    $today = getdate();
     $first = getdate(mktime(0, 0, 0, $firstmonth, $firstday, $firstyear));
     $seconds = $today[0] - $first[0];
     $days = round($seconds / 86400);
@@ -279,9 +279,9 @@ $row = $result->fetch();
 $joined_growth_rate = 0;
 $days = 1;
 if ($row && count($row) > 0) {
-    $firstyear = $row['year'];
-    $firstmonth = $row['month'];
-    $firstday = $row['day'];
+    $firstyear = (int)$row['year'];
+    $firstmonth = (int)$row['month'];
+    $firstday = (int)$row['day'];
     $first = getdate(mktime(0, 0, 0, $firstmonth, $firstday, $firstyear));
     $seconds = $today[0] - $first[0];
     $days = round($seconds / 86400);
