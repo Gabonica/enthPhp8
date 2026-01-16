@@ -304,7 +304,8 @@ if ($action === 'edit') {
                                 <?= ucwords(str_replace('_', ' ', $field)) ?>
                             </td>
                             <td>
-                                <input type="text" name="<?= $field ?>" value="<?= htmlentities($member[$field] ?? '') ?>"/>
+                                <input type="text" name="<?= $field ?>"
+                                       value="<?= htmlentities($member[$field]) ?>"/>
                             </td>
                         </tr>
                         <?php
