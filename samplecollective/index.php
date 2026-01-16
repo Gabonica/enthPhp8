@@ -51,8 +51,12 @@ include "header.php";
         <td class="right">Average owned growth rate:</td>
         <td>
             <?php
-            $new = $collective_fans_growth_rate / $owned_current;
-            echo $new;
+            if ($owned_current > 0) {
+                $new = $collective_fans_growth_rate / $owned_current;
+                echo $new;
+            } else {
+                echo 'N/A';
+            }
             ?> members/day
         </td>
     </tr>
